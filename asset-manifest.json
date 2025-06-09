@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/nus-gpa-calculator/static/css/main.e6c13ad2.css",
+    "main.js": "/nus-gpa-calculator/static/js/main.0aa1a888.js",
+    "static/js/453.3be0c406.chunk.js": "/nus-gpa-calculator/static/js/453.3be0c406.chunk.js",
+    "index.html": "/nus-gpa-calculator/index.html",
+    "main.e6c13ad2.css.map": "/nus-gpa-calculator/static/css/main.e6c13ad2.css.map",
+    "main.0aa1a888.js.map": "/nus-gpa-calculator/static/js/main.0aa1a888.js.map",
+    "453.3be0c406.chunk.js.map": "/nus-gpa-calculator/static/js/453.3be0c406.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e6c13ad2.css",
+    "static/js/main.0aa1a888.js"
+  ]
+}
