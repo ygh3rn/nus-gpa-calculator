@@ -220,6 +220,8 @@ const ErrorBoundary = ({ children }) => {
   return children;
 };
 
+
+
 const GradeSelector = ({ module, onGradeSelect, onClose }) => {
   const gradeRef = useRef(null);
 
@@ -234,7 +236,7 @@ const GradeSelector = ({ module, onGradeSelect, onClose }) => {
   }, [onClose]);
 
   return (
-    <div ref={gradeRef} className="bg-green-50 border border-green-300 rounded shadow-lg p-2 w-full">
+    <div ref={gradeRef} className="bg-white border border-gray-300 rounded shadow-lg p-2 w-full">
       {GRADE_GRID.map((row, rowIndex) => (
         <div key={rowIndex} className="flex gap-1 mb-1 last:mb-0">
           {row.map((grade, colIndex) => (
@@ -243,8 +245,8 @@ const GradeSelector = ({ module, onGradeSelect, onClose }) => {
                 key={grade}
                 type="button"
                 onClick={() => onGradeSelect(grade)}
-                className="px-2 py-1 text-xs border border-green-200 rounded hover:bg-green-100 
-                         flex-1 text-center transition-colors font-medium bg-green-50"
+                className="px-2 py-1 text-xs border border-gray-300 rounded hover:bg-gray-100 
+                         flex-1 text-center transition-colors font-medium bg-white"
               >
                 {grade}
               </button>
@@ -462,6 +464,7 @@ const SemesterCard = ({
   const [isDragOver, setIsDragOver] = useState(false);
   const [draggedModuleId, setDraggedModuleId] = useState(null);
   const [dragInsertIndex, setDragInsertIndex] = useState(-1);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   
   const semesterMCs = useMemo(() => 
     modules.reduce((sum, module) => sum + (Number(module.moduleCredit) || 0), 0),
@@ -535,7 +538,22 @@ const SemesterCard = ({
     setDragInsertIndex(-1);
   };
 
-  const cardClass = isSpecialTerm 
+  const handleDeleteClick = () => {
+    setShowDeleteConfirm(true);
+  };
+
+  const handleConfirmDelete = () => {
+    onRemoveSemester(semester);
+    setShowDeleteConfirm(false);
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteConfirm(false);
+  };
+
+  const cardClass = showDeleteConfirm 
+    ? 'bg-red-50 border-red-200 rounded-lg shadow-lg p-4 border transition-colors'
+    : isSpecialTerm 
     ? `bg-blue-50 rounded-lg shadow-lg p-4 border transition-colors ${
         isDragOver ? 'border-blue-400 bg-blue-100' : 'border-blue-200'
       }`
@@ -552,87 +570,113 @@ const SemesterCard = ({
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
-      <div className="mb-4">
-        <div className="flex justify-between items-start mb-2">
-          <h3 className={`font-bold text-lg ${titleClass}`}>{semester}</h3>
-          <button
-            onClick={() => onRemoveSemester(semester)}
-            className="text-red-500 hover:bg-red-100 p-1 rounded"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-        <div className="flex justify-between items-center">
-          <p className={`text-sm ${isSpecialTerm ? 'text-blue-600' : 'text-gray-600'}`}>
-            {modules.length} Courses • {semesterMCs} Units
+      {showDeleteConfirm ? (
+        <div className="flex flex-col items-center justify-center min-h-[200px] text-center">
+          <AlertTriangle className="w-8 h-8 text-red-600 mb-3" />
+          <h4 className="font-semibold text-red-800 text-lg mb-2">Delete {semester}?</h4>
+          <p className="text-sm text-red-700 mb-6">
+            This will remove all modules in this semester.
           </p>
-          <div className="text-right">
-            <p className="text-sm font-semibold text-orange-600">
-              GPA: {calculateSemesterGPA(semester)}
-            </p>
-            {calculateSemesterSU(semester) > 0 && (
-              <p className="text-xs text-blue-600">
-                S/U: {calculateSemesterSU(semester)} MCs
-              </p>
-            )}
+          <div className="flex gap-3">
+            <button
+              onClick={handleCancelDelete}
+              className="px-4 py-2 text-sm border border-gray-300 rounded hover:bg-gray-50 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleConfirmDelete}
+              className="px-4 py-2 text-sm bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+            >
+              Delete
+            </button>
           </div>
         </div>
-      </div>
-
-      <div className="space-y-3 mb-4 min-h-[60px]">
-        {modules.length === 0 && isDragOver && (
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-            <p className="text-gray-500">Drop module here</p>
+      ) : (
+        <>
+          <div className="mb-4">
+            <div className="flex justify-between items-start mb-2">
+              <h3 className={`font-bold text-lg ${titleClass}`}>{semester}</h3>
+              <button
+                onClick={handleDeleteClick}
+                className="text-red-500 hover:bg-red-100 p-1 rounded"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="flex justify-between items-center">
+              <p className={`text-sm ${isSpecialTerm ? 'text-blue-600' : 'text-gray-600'}`}>
+                {modules.length} Courses • {semesterMCs} Units
+              </p>
+              <div className="text-right">
+                <p className="text-sm font-semibold text-orange-600">
+                  GPA: {calculateSemesterGPA(semester)}
+                </p>
+                {calculateSemesterSU(semester) > 0 && (
+                  <p className="text-xs text-blue-600">
+                    S/U: {calculateSemesterSU(semester)} MCs
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
-        )}
-        
-        {modules.map((module, index) => {
-          const draggedIndex = modules.findIndex(m => m.id === draggedModuleId);
-          const shouldMoveDown = draggedModuleId && draggedModuleId !== module.id && 
-                                dragInsertIndex !== -1 && draggedIndex > index && index >= dragInsertIndex;
-          const shouldMoveUp = draggedModuleId && draggedModuleId !== module.id && 
-                              dragInsertIndex !== -1 && draggedIndex < index && index < dragInsertIndex;
-          
-          return (
-            <ModuleCard
-              key={module.id}
-              module={module}
-              onRemove={onRemoveModule}
-              onLetterGradeUpdate={onLetterGradeUpdate}
-              onToggleSU={onToggleSU}
-              onDragStart={handleModuleDragStart}
-              onDragEnd={handleModuleDragEnd}
-              isBeingDragged={draggedModuleId === module.id}
-              shouldMoveDown={shouldMoveDown}
-              shouldMoveUp={shouldMoveUp}
-              isSpecialTerm={isSpecialTerm}
+
+          <div className="space-y-3 mb-4 min-h-[60px]">
+            {modules.length === 0 && isDragOver && (
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                <p className="text-gray-500">Drop module here</p>
+              </div>
+            )}
+            
+            {modules.map((module, index) => {
+              const draggedIndex = modules.findIndex(m => m.id === draggedModuleId);
+              const shouldMoveDown = draggedModuleId && draggedModuleId !== module.id && 
+                                    dragInsertIndex !== -1 && draggedIndex > index && index >= dragInsertIndex;
+              const shouldMoveUp = draggedModuleId && draggedModuleId !== module.id && 
+                                  dragInsertIndex !== -1 && draggedIndex < index && index < dragInsertIndex;
+              
+              return (
+                <ModuleCard
+                  key={module.id}
+                  module={module}
+                  onRemove={onRemoveModule}
+                  onLetterGradeUpdate={onLetterGradeUpdate}
+                  onToggleSU={onToggleSU}
+                  onDragStart={handleModuleDragStart}
+                  onDragEnd={handleModuleDragEnd}
+                  isBeingDragged={draggedModuleId === module.id}
+                  shouldMoveDown={shouldMoveDown}
+                  shouldMoveUp={shouldMoveUp}
+                  isSpecialTerm={isSpecialTerm}
+                />
+              );
+            })}
+          </div>
+
+          <button
+            onClick={() => setShowModuleSearch(showModuleSearch === semester ? null : semester)}
+            className={`w-full p-2 border-2 border-dashed rounded-lg transition-colors flex items-center justify-center gap-2 ${
+              isSpecialTerm 
+                ? 'border-blue-300 text-blue-500 hover:border-blue-400 hover:text-blue-600'
+                : 'border-gray-300 text-gray-500 hover:border-orange-300 hover:text-orange-500'
+            }`}
+          >
+            <Plus className="w-4 h-4" />
+            Add Courses
+          </button>
+
+          {showModuleSearch === semester && (
+            <ModuleSearch
+              semester={semester}
+              searchTerm={searchTerm}
+              searchResults={searchResults}
+              loading={loading}
+              onSearch={onSearch}
+              onAddModule={onAddModule}
+              selectedModules={selectedModules}
             />
-          );
-        })}
-      </div>
-
-      <button
-        onClick={() => setShowModuleSearch(showModuleSearch === semester ? null : semester)}
-        className={`w-full p-2 border-2 border-dashed rounded-lg transition-colors flex items-center justify-center gap-2 ${
-          isSpecialTerm 
-            ? 'border-blue-300 text-blue-500 hover:border-blue-400 hover:text-blue-600'
-            : 'border-gray-300 text-gray-500 hover:border-orange-300 hover:text-orange-500'
-        }`}
-      >
-        <Plus className="w-4 h-4" />
-        Add Courses
-      </button>
-
-      {showModuleSearch === semester && (
-        <ModuleSearch
-          semester={semester}
-          searchTerm={searchTerm}
-          searchResults={searchResults}
-          loading={loading}
-          onSearch={onSearch}
-          onAddModule={onAddModule}
-          selectedModules={selectedModules}
-        />
+          )}
+        </>
       )}
     </div>
   );
