@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/nus-gpa-calculator/static/css/main.e6c13ad2.css",
-    "main.js": "/nus-gpa-calculator/static/js/main.0aa1a888.js",
+    "main.css": "/nus-gpa-calculator/static/css/main.4eef3aaa.css",
+    "main.js": "/nus-gpa-calculator/static/js/main.9a98669f.js",
     "static/js/453.3be0c406.chunk.js": "/nus-gpa-calculator/static/js/453.3be0c406.chunk.js",
     "index.html": "/nus-gpa-calculator/index.html",
-    "main.e6c13ad2.css.map": "/nus-gpa-calculator/static/css/main.e6c13ad2.css.map",
-    "main.0aa1a888.js.map": "/nus-gpa-calculator/static/js/main.0aa1a888.js.map",
+    "main.4eef3aaa.css.map": "/nus-gpa-calculator/static/css/main.4eef3aaa.css.map",
+    "main.9a98669f.js.map": "/nus-gpa-calculator/static/js/main.9a98669f.js.map",
     "453.3be0c406.chunk.js.map": "/nus-gpa-calculator/static/js/453.3be0c406.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.e6c13ad2.css",
-    "static/js/main.0aa1a888.js"
+    "static/css/main.4eef3aaa.css",
+    "static/js/main.9a98669f.js"
   ]
 }
