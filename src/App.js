@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Plus, X, Info, AlertTriangle } from 'lucide-react';
+import { Plus, X, Info, AlertTriangle, Eye, EyeOff } from 'lucide-react';
 
 // Constants
 const GRADE_POINTS = {
@@ -16,7 +16,8 @@ const STORAGE_KEYS = {
   ACADEMIC_SETTINGS: 'nus-gpa-academicSettings',
   SELECTED_YEAR: 'nus-gpa-selectedYear',
   VISIBLE_YEARS: 'nus-gpa-visibleYears',
-  SHOW_HINT: 'nus-gpa-showHint'
+  SHOW_HINT: 'nus-gpa-showHint',
+  HIDE_GRADES: 'nus-gpa-hideGrades'
 };
 
 const MATRIC_YEAR_OPTIONS = [
@@ -220,8 +221,6 @@ const ErrorBoundary = ({ children }) => {
   return children;
 };
 
-
-
 const GradeSelector = ({ module, onGradeSelect, onClose }) => {
   const gradeRef = useRef(null);
 
@@ -270,7 +269,8 @@ const ModuleCard = ({
   isBeingDragged,
   shouldMoveDown,
   shouldMoveUp,
-  isSpecialTerm
+  isSpecialTerm,
+  hideGrades = false
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [showGradeSelector, setShowGradeSelector] = useState(false);
@@ -328,6 +328,7 @@ const ModuleCard = ({
     : { title: "text-green-800", subtitle: "text-green-700", meta: "text-green-600" };
 
   const displayGrade = () => {
+    if (hideGrades) return '***';
     if (!module.letterGrade) return 'Grade';
     if (module.isSU) {
       return module.letterGrade === 'F' ? 'U' : 'S';
@@ -365,28 +366,30 @@ const ModuleCard = ({
           <div className={`text-xs ${textClasses.meta}`}>{module.moduleCredit} Units</div>
         </div>
         
-        <div className="w-32 relative -ml-8 sm:-ml-4">
-          {!showGradeSelector && (
-            <button
-              onClick={handleGradeClick}
-              className={`w-full px-3 py-2 border border-gray-300 rounded text-base font-bold
-                         bg-white hover:bg-gray-50 transition-colors cursor-pointer
-                         ${module.isSU ? 'bg-blue-100 border-blue-300' : ''}
-                         ${showGradeSelector ? 'ring-2 ring-blue-300' : ''}
-                         ${isPlaceholder ? 'text-gray-400' : 'text-gray-900'}`}
-            >
-              {displayGrade()}
-            </button>
-          )}
-          
-          {showGradeSelector && (
-            <GradeSelector
-              module={module}
-              onGradeSelect={handleGradeSelect}
-              onClose={() => setShowGradeSelector(false)}
-            />
-          )}
-        </div>
+        {!hideGrades && (
+          <div className="w-32 relative -ml-8 sm:-ml-4">
+            {!showGradeSelector && (
+              <button
+                onClick={handleGradeClick}
+                className={`w-full px-3 py-2 border border-gray-300 rounded text-base font-bold
+                           bg-white hover:bg-gray-50 transition-colors cursor-pointer
+                           ${module.isSU ? 'bg-blue-100 border-blue-300' : ''}
+                           ${showGradeSelector ? 'ring-2 ring-blue-300' : ''}
+                           ${isPlaceholder ? 'text-gray-400' : 'text-gray-900'}`}
+              >
+                {displayGrade()}
+              </button>
+            )}
+            
+            {showGradeSelector && (
+              <GradeSelector
+                module={module}
+                onGradeSelect={handleGradeSelect}
+                onClose={() => setShowGradeSelector(false)}
+              />
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -459,7 +462,8 @@ const SemesterCard = ({
   calculateSemesterGPA,
   calculateSemesterSU,
   selectedModules,
-  isSpecialTerm = false
+  isSpecialTerm = false,
+  hideGrades = false
 }) => {
   const [isDragOver, setIsDragOver] = useState(false);
   const [draggedModuleId, setDraggedModuleId] = useState(null);
@@ -609,13 +613,17 @@ const SemesterCard = ({
                 {modules.length} Courses • {semesterMCs} Units
               </p>
               <div className="text-right">
-                <p className="text-sm font-semibold text-orange-600">
-                  GPA: {calculateSemesterGPA(semester)}
-                </p>
-                {calculateSemesterSU(semester) > 0 && (
-                  <p className="text-xs text-blue-600">
-                    S/U: {calculateSemesterSU(semester)} MCs
-                  </p>
+                {!hideGrades && (
+                  <>
+                    <p className="text-sm font-semibold text-orange-600">
+                      GPA: {calculateSemesterGPA(semester)}
+                    </p>
+                    {calculateSemesterSU(semester) > 0 && (
+                      <p className="text-xs text-blue-600">
+                        S/U: {calculateSemesterSU(semester)} MCs
+                      </p>
+                    )}
+                  </>
                 )}
               </div>
             </div>
@@ -648,6 +656,7 @@ const SemesterCard = ({
                   shouldMoveDown={shouldMoveDown}
                   shouldMoveUp={shouldMoveUp}
                   isSpecialTerm={isSpecialTerm}
+                  hideGrades={hideGrades}
                 />
               );
             })}
@@ -692,7 +701,8 @@ const Sidebar = ({
   onSelectYear,
   onRemoveYear,
   onAddYear,
-  semestersByYear
+  semestersByYear,
+  hideGrades = false
 }) => (
   <div className="w-full lg:w-56 bg-white shadow-lg p-4 border-b lg:border-r lg:border-b-0 border-gray-200">
     <h3 className="font-semibold text-gray-800 mb-3">Matriculation Year</h3>
@@ -723,10 +733,10 @@ const Sidebar = ({
     <div className="mb-4 p-3 bg-blue-50 rounded-lg">
       <h4 className="font-semibold text-sm text-blue-800 mb-2">S/U Options</h4>
       <p className="text-xs text-blue-600">
-        First 2 sems: {suData.firstTwoSlots} slots ({suData.firstTwoRemaining}/{suData.maxFirstTwo} MCs)
+        First 2 sems: {hideGrades ? '***' : `${suData.firstTwoSlots} slots (${suData.firstTwoRemaining}/${suData.maxFirstTwo} MCs)`}
       </p>
       <p className="text-xs text-blue-600">
-        Subsequent: {suData.subsequentSlots} slots ({suData.subsequentRemaining}/{suData.maxSubsequent} MCs)
+        Subsequent: {hideGrades ? '***' : `${suData.subsequentSlots} slots (${suData.subsequentRemaining}/${suData.maxSubsequent} MCs)`}
       </p>
     </div>
 
@@ -762,32 +772,38 @@ const Sidebar = ({
         </button>
       )}
     </div>
-
-    <div className="mt-4 p-2 bg-green-50 rounded-lg">
-      <p className="text-xs text-green-600 text-center">✓ Data automatically saved</p>
-    </div>
   </div>
 );
 
-const GPASummary = ({ gpaData }) => (
-  <div className="flex flex-wrap gap-2 md:gap-4 items-center">
-    <div className="bg-orange-100 rounded-lg px-3 md:px-4 py-2 text-center">
-      <div className="text-xl md:text-2xl font-bold text-orange-600">
-        {gpaData.gpa.toFixed(2)}
+const GPASummary = ({ gpaData, hideGrades, onToggleHideGrades }) => (
+  <div className="flex items-center gap-3">
+    <button
+      onClick={onToggleHideGrades}
+      className="p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-600"
+      title={hideGrades ? "Show grades" : "Hide grades"}
+    >
+      {hideGrades ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+    </button>
+    
+    <div className="flex flex-wrap gap-2 md:gap-4 items-center">
+      <div className="bg-orange-100 rounded-lg px-3 md:px-4 py-2 text-center">
+        <div className="text-xl md:text-2xl font-bold text-orange-600">
+          {hideGrades ? '***' : gpaData.gpa.toFixed(2)}
+        </div>
+        <div className="text-xs text-gray-600">Cumulative GPA</div>
       </div>
-      <div className="text-xs text-gray-600">Cumulative GPA</div>
-    </div>
-    <div className="bg-blue-100 rounded-lg px-3 md:px-4 py-2 text-center">
-      <div className="text-xl md:text-2xl font-bold text-blue-600">
-        {gpaData.gradedMCs}
+      <div className="bg-blue-100 rounded-lg px-3 md:px-4 py-2 text-center">
+        <div className="text-xl md:text-2xl font-bold text-blue-600">
+          {gpaData.gradedMCs}
+        </div>
+        <div className="text-xs text-gray-600">Graded MCs</div>
       </div>
-      <div className="text-xs text-gray-600">Graded MCs</div>
-    </div>
-    <div className="bg-green-100 rounded-lg px-3 md:px-4 py-2 text-center">
-      <div className="text-xl md:text-2xl font-bold text-green-600">
-        {gpaData.totalMCs}
+      <div className="bg-green-100 rounded-lg px-3 md:px-4 py-2 text-center">
+        <div className="text-xl md:text-2xl font-bold text-green-600">
+          {gpaData.totalMCs}
+        </div>
+        <div className="text-xs text-gray-600">Total MCs</div>
       </div>
-      <div className="text-xs text-gray-600">Total MCs</div>
     </div>
   </div>
 );
@@ -836,6 +852,22 @@ const SUHint = ({ showHint, onHide }) => {
   );
 };
 
+const NUSModsAcknowledgement = () => (
+  <div className="fixed bottom-4 left-4 text-xs text-gray-500 z-40">
+    <p>
+      Module data from{' '}
+      <a 
+        href="https://nusmods.com" 
+        target="_blank" 
+        rel="noopener noreferrer"
+        className="text-blue-500 hover:text-blue-600 underline"
+      >
+        NUSMods
+      </a>
+    </p>
+  </div>
+);
+
 // Main component
 const NUSGPACalculator = () => {
   const [selectedModules, setSelectedModules] = useLocalStorage(STORAGE_KEYS.SELECTED_MODULES, []);
@@ -844,6 +876,7 @@ const NUSGPACalculator = () => {
   const [selectedYear, setSelectedYear] = useLocalStorage(STORAGE_KEYS.SELECTED_YEAR, '');
   const [visibleYears, setVisibleYears] = useLocalStorage(STORAGE_KEYS.VISIBLE_YEARS, []);
   const [showHint, setShowHint] = useLocalStorage(STORAGE_KEYS.SHOW_HINT, true);
+  const [hideGrades, setHideGrades] = useLocalStorage(STORAGE_KEYS.HIDE_GRADES, false);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -1079,6 +1112,10 @@ const NUSGPACalculator = () => {
     }
   }, [semestersByYear, visibleYears]);
 
+  const toggleHideGrades = useCallback(() => {
+    setHideGrades(prev => !prev);
+  }, []);
+
   useEffect(() => {
     fetchModules();
   }, [fetchModules]);
@@ -1138,15 +1175,16 @@ const NUSGPACalculator = () => {
         onRemoveYear={removeAcademicYear}
         onAddYear={addAcademicYear}
         semestersByYear={semestersByYear}
+        hideGrades={hideGrades}
       />
 
       <div className="flex-1 p-4 relative">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
             <h1 className="text-2xl md:text-3xl font-bold text-orange-600">
-              NUS GPA Calculator
+              NUS StudyBoard
             </h1>
-            <GPASummary gpaData={gpaData} />
+            <GPASummary gpaData={gpaData} hideGrades={hideGrades} onToggleHideGrades={toggleHideGrades} />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
@@ -1170,6 +1208,7 @@ const NUSGPACalculator = () => {
                 calculateSemesterGPA={calculateSemesterGPA}
                 calculateSemesterSU={calculateSemesterSU}
                 selectedModules={selectedModules}
+                hideGrades={hideGrades}
               />
             ))}
 
@@ -1202,6 +1241,7 @@ const NUSGPACalculator = () => {
                         calculateSemesterSU={calculateSemesterSU}
                         selectedModules={selectedModules}
                         isSpecialTerm={true}
+                        hideGrades={hideGrades}
                       />
                     ))}
 
@@ -1231,6 +1271,7 @@ const NUSGPACalculator = () => {
           isVisible={showNotification} 
           onHide={hideNotification} 
         />
+        <NUSModsAcknowledgement />
       </div>
     </div>
   );
