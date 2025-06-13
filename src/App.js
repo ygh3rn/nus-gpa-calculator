@@ -274,10 +274,6 @@ const ErrorBoundary = ({ children }) => {
   return children;
 };
 
-// SettingsPanel component removed - now integrated into GPASummary
-
-// TargetGPAPanel component removed - now integrated into GPASummary
-
 const GradeSelector = ({ module, onGradeSelect, onClose }) => {
   const gradeRef = useRef(null);
 
@@ -665,25 +661,23 @@ const SemesterCard = ({
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-start">
               <p className={`text-sm ${isSpecialTerm ? 'text-blue-600' : 'text-gray-600'}`}>
                 {modules.length} Courses • {semesterMCs} Units
               </p>
-              <div className="text-right">
-                {!hideGrades && (
-                  <>
-                    <p className="text-sm font-semibold text-orange-600">
-                      GPA: {calculateSemesterGPA(semester)}
-                    </p>
-                    {calculateSemesterSU(semester) > 0 && (
-                      <p className="text-xs text-purple-600">
-                        S/U: {calculateSemesterSU(semester)} MCs
-                      </p>
-                    )}
-                  </>
-                )}
-              </div>
+              {!hideGrades && (
+                <p className="text-sm font-semibold text-orange-600">
+                  GPA: {calculateSemesterGPA(semester)}
+                </p>
+              )}
             </div>
+            {!hideGrades && (
+              <div className="flex justify-end">
+                <p className={`text-xs h-4 ${calculateSemesterSU(semester) > 0 ? 'text-purple-600' : 'text-transparent select-none'}`}>
+                  S/U: {calculateSemesterSU(semester)} MCs
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="space-y-3 mb-4 min-h-[8px]">
@@ -961,7 +955,7 @@ const GPASummary = ({ gpaData, suData, hideGrades, onToggleHideGrades, academicS
           </div>
           
           {showTargetPanel && (
-            <div className="absolute top-full left-0 mt-2 w-60 md:w-64 lg:w-72 max-w-[40vw] bg-gradient-to-br from-orange-50 to-blue-50 rounded-lg p-4 border border-orange-200 shadow-lg z-50">
+            <div className="absolute top-full left-0 mt-2 w-60 md:w-64 lg:w-80 max-w-[40vw] bg-gradient-to-br from-orange-50 to-blue-50 rounded-lg p-4 border border-orange-200 shadow-lg z-50">
               <div className="flex items-center gap-2 mb-4">
                 <Target className="w-5 h-5 text-orange-600" />
                 <h3 className="text-lg font-semibold text-gray-800">Target GPA Calculator</h3>
@@ -985,7 +979,7 @@ const GPASummary = ({ gpaData, suData, hideGrades, onToggleHideGrades, academicS
           )}
           
           {showSettingsPanel && (
-            <div className="absolute top-full left-0 mt-2 w-60 md:w-64 lg:w-72 max-w-[40vw] bg-white rounded-lg p-4 border border-gray-200 shadow-lg z-50">
+            <div className="absolute top-full left-0 mt-2 w-60 md:w-64 lg:w-80 max-w-[40vw] bg-white rounded-lg p-4 border border-gray-200 shadow-lg z-50">
               <div className="flex items-center gap-2 mb-4">
                 <Settings className="w-5 h-5 text-gray-600" />
                 <h3 className="text-lg font-semibold text-gray-800">Settings</h3>
