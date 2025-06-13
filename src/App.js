@@ -274,140 +274,9 @@ const ErrorBoundary = ({ children }) => {
   return children;
 };
 
-const SettingsPanel = ({ isOpen, academicSettings, onToggleAPCs, onClose }) => {
-  const settingsRef = useRef(null);
+// SettingsPanel component removed - now integrated into GPASummary
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (settingsRef.current && !settingsRef.current.contains(event.target)) {
-        onClose();
-      }
-    };
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }
-  }, [isOpen, onClose]);
-
-  if (!isOpen) return null;
-
-  return (
-    <div ref={settingsRef} className="absolute top-full right-0 mt-2 w-64 bg-white rounded-lg p-4 border border-gray-200 shadow-lg z-50">
-      <div className="flex items-center gap-2 mb-4">
-        <Settings className="w-5 h-5 text-gray-600" />
-        <h3 className="text-lg font-semibold text-gray-800">Settings</h3>
-      </div>
-
-      <div className="space-y-3">
-        <div>
-          <label className="flex items-center gap-2 text-sm text-gray-700">
-            <input
-              type="checkbox"
-              checked={academicSettings.hasAPCs}
-              onChange={onToggleAPCs}
-              className="rounded"
-            />
-            20+ APCs (reduces S/U to 20 MCs)
-          </label>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const TargetGPAPanel = ({ isOpen, gpaData, hideGrades }) => {
-  const [targetGPA, setTargetGPA] = useState('');
-  const [results, setResults] = useState(null);
-
-  const handleCalculate = () => {
-    const target = parseFloat(targetGPA);
-    if (isNaN(target) || target < 0 || target > 5) {
-      setResults({ message: "Please enter a valid GPA between 0.00 and 5.00" });
-      return;
-    }
-
-    const calculation = calculateTargetGrades(
-      gpaData.gpa,
-      gpaData.gradedMCs,
-      gpaData.totalPoints,
-      target
-    );
-    setResults(calculation);
-  };
-
-  if (!isOpen) return null;
-
-  return (
-    <div className="absolute top-full right-0 mt-2 w-80 bg-gradient-to-br from-orange-50 to-blue-50 rounded-lg p-4 border border-orange-200 shadow-lg z-50">
-      <div className="flex items-center gap-2 mb-4">
-        <Target className="w-5 h-5 text-orange-600" />
-        <h3 className="text-lg font-semibold text-gray-800">Target GPA Calculator</h3>
-      </div>
-
-      {!hideGrades && (
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <div className="bg-white/60 rounded-lg p-3 text-center">
-            <div className="text-lg font-bold text-orange-600">{gpaData.gpa.toFixed(2)}</div>
-            <div className="text-xs text-gray-600">Current GPA</div>
-          </div>
-          <div className="bg-white/60 rounded-lg p-3 text-center">
-            <div className="text-lg font-bold text-blue-600">{gpaData.gradedMCs}</div>
-            <div className="text-xs text-gray-600">Graded MCs</div>
-          </div>
-        </div>
-      )}
-
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Target GPA (0.00 - 5.00)
-        </label>
-        <div className="flex gap-2">
-          <input
-            type="number"
-            min="0"
-            max="5"
-            step="0.01"
-            value={targetGPA}
-            onChange={(e) => setTargetGPA(e.target.value)}
-            placeholder="e.g., 4.30"
-            className="flex-1 p-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-          />
-          <button
-            onClick={handleCalculate}
-            className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium shadow-sm"
-          >
-            Calculate
-          </button>
-        </div>
-      </div>
-
-      {results && (
-        <div className="bg-white/80 rounded-lg p-4 border border-blue-200">
-          {results.message ? (
-            <p className="text-sm text-blue-800 font-medium">{results.message}</p>
-          ) : (
-            <div>
-              <p className="text-sm font-medium text-blue-800 mb-3">
-                To reach GPA {targetGPA}, you need at least:
-              </p>
-              <div className="grid gap-2">
-                {results.results.map((result, index) => (
-                  <div key={index} className="flex justify-between items-center bg-blue-50 rounded-lg p-2">
-                    <span className="text-sm text-blue-700">{result.grade} modules</span>
-                    <span className="font-bold text-blue-800">{result.modules}</span>
-                  </div>
-                ))}
-              </div>
-              <p className="text-xs text-blue-600 mt-3 italic">
-                * Calculations assume 4-unit modules
-              </p>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-};
+// TargetGPAPanel component removed - now integrated into GPASummary
 
 const GradeSelector = ({ module, onGradeSelect, onClose }) => {
   const gradeRef = useRef(null);
@@ -807,7 +676,7 @@ const SemesterCard = ({
                       GPA: {calculateSemesterGPA(semester)}
                     </p>
                     {calculateSemesterSU(semester) > 0 && (
-                      <p className="text-xs text-blue-600">
+                      <p className="text-xs text-purple-600">
                         S/U: {calculateSemesterSU(semester)} MCs
                       </p>
                     )}
@@ -817,7 +686,7 @@ const SemesterCard = ({
             </div>
           </div>
 
-          <div className="space-y-3 mb-4 min-h-[60px]">
+          <div className="space-y-3 mb-4 min-h-[8px]">
             {modules.length === 0 && isDragOver && (
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
                 <p className="text-gray-500">Drop module here</p>
@@ -850,28 +719,63 @@ const SemesterCard = ({
             })}
           </div>
 
-          <button
-            onClick={() => setShowModuleSearch(showModuleSearch === semester ? null : semester)}
-            className={`w-full p-2 border-2 border-dashed rounded-lg transition-colors flex items-center justify-center gap-2 ${
-              isSpecialTerm 
-                ? 'border-blue-300 text-blue-500 hover:border-blue-400 hover:text-blue-600'
-                : 'border-gray-300 text-gray-500 hover:border-orange-300 hover:text-orange-500'
-            }`}
-          >
-            <Plus className="w-4 h-4" />
-            Add Courses
-          </button>
-
-          {showModuleSearch === semester && (
-            <ModuleSearch
-              semester={semester}
-              searchTerm={searchTerm}
-              searchResults={searchResults}
-              loading={loading}
-              onSearch={onSearch}
-              onAddModule={onAddModule}
-              selectedModules={selectedModules}
-            />
+          {showModuleSearch === semester ? (
+            <div className="w-full border-2 border-dashed rounded-lg bg-gray-50 relative">
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => onSearch(e.target.value)}
+                placeholder="Search module..."
+                className="w-full p-2 pr-8 border-0 bg-transparent text-sm text-gray-900 rounded-lg focus:outline-none"
+                autoFocus
+              />
+              
+              <button
+                onClick={() => setShowModuleSearch(null)}
+                className="absolute right-2 top-2 text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              
+              {searchResults.length > 0 && (
+                <div className="absolute z-30 w-full left-0 top-full bg-white border border-gray-300 rounded mt-1 max-h-48 overflow-y-auto">
+                  {searchResults.map((module) => {
+                    const isAlreadyTaken = selectedModules.some(m => m.moduleCode === module.moduleCode);
+                    return (
+                      <button
+                        key={module.moduleCode}
+                        onClick={() => !isAlreadyTaken && onAddModule(module.moduleCode, semester)}
+                        className={`w-full text-left p-2 border-b last:border-b-0 border-gray-200 transition-colors
+                          ${isAlreadyTaken 
+                            ? 'opacity-50 cursor-not-allowed bg-gray-100' 
+                            : 'hover:bg-gray-100 cursor-pointer'
+                          }`}
+                        disabled={loading || isAlreadyTaken}
+                      >
+                        <div className={`font-semibold text-sm ${isAlreadyTaken ? 'text-gray-400' : 'text-gray-900'}`}>
+                          {module.moduleCode} {isAlreadyTaken && '(Already taken)'}
+                        </div>
+                        <div className={`text-xs truncate ${isAlreadyTaken ? 'text-gray-400' : 'text-gray-600'}`}>
+                          {module.title}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={() => setShowModuleSearch(semester)}
+              className={`w-full p-2 border-2 border-dashed rounded-lg transition-colors flex items-center justify-center gap-2 ${
+                isSpecialTerm 
+                  ? 'border-blue-300 text-blue-500 hover:border-blue-400 hover:text-blue-600'
+                  : 'border-gray-300 text-gray-500 hover:border-orange-300 hover:text-orange-500'
+              }`}
+            >
+              <Plus className="w-4 h-4" />
+              Add Courses
+            </button>
           )}
         </>
       )}
@@ -892,10 +796,10 @@ const Sidebar = ({
   activeSemesters,
   onAddSemester
 }) => (
-  <div className="w-full lg:w-56 bg-white shadow-lg p-4 border-b lg:border-r lg:border-b-0 border-gray-200">
+  <div className="w-full lg:w-44 bg-white shadow-lg p-4 border-b lg:border-r lg:border-b-0 border-gray-200">
     <div className="mb-6">
       <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 bg-clip-text text-transparent mb-1">
-        NUS StudyBoard
+        GradeGauge
       </h1>
       <div className="h-1 w-full bg-gradient-to-r from-orange-400 via-red-400 to-pink-400 rounded-full mb-1"></div>
       <p className="text-xs text-gray-500 font-medium">Your Academic Journey</p>
@@ -963,94 +867,224 @@ const Sidebar = ({
   </div>
 );
 
-const GPASummary = ({ gpaData, hideGrades, onToggleHideGrades, academicSettings, onToggleAPCs }) => {
+const GPASummary = ({ gpaData, suData, hideGrades, onToggleHideGrades, academicSettings, onToggleAPCs }) => {
   const [showTargetPanel, setShowTargetPanel] = useState(false);
   const [showSettingsPanel, setShowSettingsPanel] = useState(false);
+  const panelRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (panelRef.current && !panelRef.current.contains(event.target)) {
+        setShowTargetPanel(false);
+        setShowSettingsPanel(false);
+      }
+    };
+    
+    if (showTargetPanel || showSettingsPanel) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showTargetPanel, showSettingsPanel]);
 
   return (
     <div className="relative">
-      <div className="flex flex-wrap gap-2 md:gap-4 items-start mb-3">
-        <div className="bg-orange-100 rounded-lg px-3 md:px-4 py-2 text-center">
-          <div className="text-xl md:text-2xl font-bold text-orange-600">
-            {hideGrades ? '***' : gpaData.gpa.toFixed(2)}
+      <div className="flex items-start gap-3">
+        <div className="flex flex-col gap-3">
+          <div className="bg-orange-100 rounded-lg px-4 py-2 text-center w-full">
+            <div className="text-xl md:text-2xl font-bold text-orange-600">
+              {hideGrades ? '***' : gpaData.gpa.toFixed(2)}
+            </div>
+            <div className="text-xs text-gray-600">Cumulative GPA</div>
           </div>
-          <div className="text-xs text-gray-600">Cumulative GPA</div>
+          
+          <div className="bg-blue-100 rounded-lg px-4 py-2 text-center w-full">
+            <div className="text-xl md:text-2xl font-bold text-blue-600">
+              {gpaData.gradedMCs}
+            </div>
+            <div className="text-xs text-gray-600">Graded MCs</div>
+          </div>
+          
+          <div className="bg-green-100 rounded-lg px-4 py-2 text-center w-full">
+            <div className="text-xl md:text-2xl font-bold text-green-600">
+              {gpaData.totalMCs}
+            </div>
+            <div className="text-xs text-gray-600">Total MCs</div>
+          </div>
+          
+          <div className="bg-purple-100 rounded-lg px-4 py-2 text-center w-full">
+            <div className="text-xl md:text-2xl font-bold text-purple-600">
+              {hideGrades ? '***' : `${suData.subsequentSlots} (${suData.firstTwoSlots})`}
+            </div>
+            <div className="text-xs text-gray-600">Remaining SUs</div>
+          </div>
         </div>
-        <div className="bg-blue-100 rounded-lg px-3 md:px-4 py-2 text-center">
-          <div className="text-xl md:text-2xl font-bold text-blue-600">
-            {gpaData.gradedMCs}
+        
+        <div className="relative" ref={panelRef}>
+          <div className="flex gap-1 pt-2">
+            <button
+              onClick={onToggleHideGrades}
+              className="p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-600"
+              title={hideGrades ? "Show grades" : "Hide grades"}
+            >
+              {hideGrades ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+            </button>
+            
+            <button
+              onClick={() => {
+                setShowTargetPanel(!showTargetPanel);
+                setShowSettingsPanel(false);
+              }}
+              className={`p-2 rounded-lg transition-colors ${
+                showTargetPanel 
+                  ? 'bg-orange-100 text-orange-600' 
+                  : 'hover:bg-gray-100 text-gray-600'
+              }`}
+              title="Calculate target GPA"
+            >
+              <Target className="w-5 h-5" />
+            </button>
+            
+            <button
+              onClick={() => {
+                setShowSettingsPanel(!showSettingsPanel);
+                setShowTargetPanel(false);
+              }}
+              className={`p-2 rounded-lg transition-colors ${
+                showSettingsPanel 
+                  ? 'bg-gray-100 text-gray-600' 
+                  : 'hover:bg-gray-100 text-gray-600'
+              }`}
+              title="Settings"
+            >
+              <Settings className="w-5 h-5" />
+            </button>
           </div>
-          <div className="text-xs text-gray-600">Graded MCs</div>
-        </div>
-        <div className="bg-green-100 rounded-lg px-3 md:px-4 py-2 text-center">
-          <div className="text-xl md:text-2xl font-bold text-green-600">
-            {gpaData.totalMCs}
-          </div>
-          <div className="text-xs text-gray-600">Total MCs</div>
+          
+          {showTargetPanel && (
+            <div className="absolute top-full left-0 mt-2 w-60 md:w-64 lg:w-72 max-w-[40vw] bg-gradient-to-br from-orange-50 to-blue-50 rounded-lg p-4 border border-orange-200 shadow-lg z-50">
+              <div className="flex items-center gap-2 mb-4">
+                <Target className="w-5 h-5 text-orange-600" />
+                <h3 className="text-lg font-semibold text-gray-800">Target GPA Calculator</h3>
+              </div>
+
+              {!hideGrades && (
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div className="bg-white/60 rounded-lg p-3 text-center">
+                    <div className="text-lg font-bold text-orange-600">{gpaData.gpa.toFixed(2)}</div>
+                    <div className="text-xs text-gray-600">Current GPA</div>
+                  </div>
+                  <div className="bg-white/60 rounded-lg p-3 text-center">
+                    <div className="text-lg font-bold text-blue-600">{gpaData.gradedMCs}</div>
+                    <div className="text-xs text-gray-600">Graded MCs</div>
+                  </div>
+                </div>
+              )}
+
+              <TargetGPAContent gpaData={gpaData} hideGrades={hideGrades} />
+            </div>
+          )}
+          
+          {showSettingsPanel && (
+            <div className="absolute top-full left-0 mt-2 w-60 md:w-64 lg:w-72 max-w-[40vw] bg-white rounded-lg p-4 border border-gray-200 shadow-lg z-50">
+              <div className="flex items-center gap-2 mb-4">
+                <Settings className="w-5 h-5 text-gray-600" />
+                <h3 className="text-lg font-semibold text-gray-800">Settings</h3>
+              </div>
+
+              <div className="space-y-3">
+                <div>
+                  <label className="flex items-center gap-2 text-sm text-gray-700">
+                    <input
+                      type="checkbox"
+                      checked={academicSettings.hasAPCs}
+                      onChange={onToggleAPCs}
+                      className="rounded"
+                    />
+                    20+ APCs (reduces S/U to 20 MCs)
+                  </label>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
-      
-      <div className="flex items-center gap-3">
-        <button
-          onClick={onToggleHideGrades}
-          className="p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-600"
-          title={hideGrades ? "Show grades" : "Hide grades"}
-        >
-          {hideGrades ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-        </button>
-        
-        <button
-          onClick={() => setShowTargetPanel(!showTargetPanel)}
-          className={`p-2 rounded-lg transition-colors ${
-            showTargetPanel 
-              ? 'bg-orange-100 text-orange-600' 
-              : 'hover:bg-gray-100 text-gray-600'
-          }`}
-          title="Calculate target GPA"
-        >
-          <Target className="w-5 h-5" />
-        </button>
-        
-        <button
-          onClick={() => setShowSettingsPanel(!showSettingsPanel)}
-          className={`p-2 rounded-lg transition-colors ${
-            showSettingsPanel 
-              ? 'bg-gray-100 text-gray-600' 
-              : 'hover:bg-gray-100 text-gray-600'
-          }`}
-          title="Settings"
-        >
-          <Settings className="w-5 h-5" />
-        </button>
-      </div>
-      
-      <TargetGPAPanel
-        isOpen={showTargetPanel}
-        gpaData={gpaData}
-        hideGrades={hideGrades}
-      />
-      
-      <SettingsPanel
-        isOpen={showSettingsPanel}
-        academicSettings={academicSettings}
-        onToggleAPCs={onToggleAPCs}
-        onClose={() => setShowSettingsPanel(false)}
-      />
     </div>
   );
 };
 
-const SUOptionsDisplay = ({ suData, hideGrades }) => (
-  <div className="fixed bottom-16 left-4 w-48 p-3 bg-blue-50 rounded-lg border border-blue-200 shadow-lg z-40">
-    <h4 className="font-semibold text-sm text-blue-800 mb-2">S/U Options</h4>
-    <p className="text-xs text-blue-600">
-      First AY: {hideGrades ? '***' : `${suData.firstTwoSlots} slots (${suData.firstTwoRemaining}/${suData.maxFirstTwo} MCs)`}
-    </p>
-    <p className="text-xs text-blue-600">
-      Carry-over: {hideGrades ? '***' : `${suData.subsequentSlots} slots (${suData.subsequentRemaining}/${suData.maxSubsequent} MCs)`}
-    </p>
-  </div>
-);
+const TargetGPAContent = ({ gpaData, hideGrades }) => {
+  const [targetGPA, setTargetGPA] = useState('');
+  const [results, setResults] = useState(null);
+
+  const handleCalculate = () => {
+    const target = parseFloat(targetGPA);
+    if (isNaN(target) || target < 0 || target > 5) {
+      setResults({ message: "Please enter a valid GPA between 0.00 and 5.00" });
+      return;
+    }
+
+    const calculation = calculateTargetGrades(
+      gpaData.gpa,
+      gpaData.gradedMCs,
+      gpaData.totalPoints,
+      target
+    );
+    setResults(calculation);
+  };
+
+  return (
+    <>
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Target GPA (0.00 - 5.00)
+        </label>
+        <div className="flex gap-2">
+          <input
+            type="number"
+            min="0"
+            max="5"
+            step="0.01"
+            value={targetGPA}
+            onChange={(e) => setTargetGPA(e.target.value)}
+            placeholder="e.g., 4.30"
+            className="flex-1 p-3 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+          />
+          <button
+            onClick={handleCalculate}
+            className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium shadow-sm"
+          >
+            Calculate
+          </button>
+        </div>
+      </div>
+
+      {results && (
+        <div className="bg-white/80 rounded-lg p-4 border border-blue-200">
+          {results.message ? (
+            <p className="text-sm text-blue-800 font-medium">{results.message}</p>
+          ) : (
+            <div>
+              <p className="text-sm font-medium text-blue-800 mb-3">
+                To reach GPA {targetGPA}, you need at least:
+              </p>
+              <div className="grid gap-2">
+                {results.results.map((result, index) => (
+                  <div key={index} className="flex justify-between items-center bg-blue-50 rounded-lg p-2">
+                    <span className="text-sm text-blue-700">{result.grade} modules</span>
+                    <span className="font-bold text-blue-800">{result.modules}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-blue-600 mt-3 italic">
+                * Calculations assume 4-unit modules
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+    </>
+  );
+};
 
 const NotificationPopup = ({ message, isVisible, onHide }) => {
   useEffect(() => {
@@ -1097,7 +1131,7 @@ const SUHint = ({ showHint, onHide }) => {
 };
 
 const NUSModsAcknowledgement = () => (
-  <div className="fixed bottom-4 left-4 text-xs text-gray-500 z-40">
+  <div className="fixed bottom-0 left-0 right-0 text-center py-2 text-xs text-gray-400 bg-white border-t border-gray-200 z-10">
     <p>
       Module data from{' '}
       <a 
@@ -1422,35 +1456,39 @@ const NUSGPACalculator = () => {
         onAddSemester={addSemester}
       />
 
-      <div className="flex-1 p-4 relative">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6 mb-6">
-            {activeCurrentYearSemesters.filter(sem => !sem.includes('ST')).slice(0, 2).map((semester) => (
-              <SemesterCard
-                key={semester}
-                semester={semester}
-                modules={modulesBySemester[semester] || []}
-                onRemoveSemester={removeSemester}
-                onRemoveModule={removeModule}
-                onLetterGradeUpdate={updateLetterGrade}
-                onToggleSU={toggleSU}
-                onMoveModule={moveModule}
-                showModuleSearch={showModuleSearch}
-                setShowModuleSearch={setShowModuleSearch}
-                searchTerm={searchTerm}
-                searchResults={searchResults}
-                loading={loading}
-                onSearch={handleSearch}
-                onAddModule={addModule}
-                calculateSemesterGPA={calculateSemesterGPA}
-                calculateSemesterSU={calculateSemesterSU}
-                selectedModules={selectedModules}
-                hideGrades={hideGrades}
-              />
-            ))}
-            <div className="flex justify-center items-start">
+      <div className="flex-1 pl-2 pr-4 py-4 relative">
+        <div className="max-w-5xl mr-auto ml-3">
+          <div className="flex flex-col lg:flex-row gap-2 md:gap-4 mb-6">
+            <div className="flex flex-col md:flex-row gap-2 md:gap-4 flex-1">
+              {activeCurrentYearSemesters.filter(sem => !sem.includes('ST')).slice(0, 2).map((semester) => (
+                <div key={semester} className="flex-1">
+                  <SemesterCard
+                    semester={semester}
+                    modules={modulesBySemester[semester] || []}
+                    onRemoveSemester={removeSemester}
+                    onRemoveModule={removeModule}
+                    onLetterGradeUpdate={updateLetterGrade}
+                    onToggleSU={toggleSU}
+                    onMoveModule={moveModule}
+                    showModuleSearch={showModuleSearch}
+                    setShowModuleSearch={setShowModuleSearch}
+                    searchTerm={searchTerm}
+                    searchResults={searchResults}
+                    loading={loading}
+                    onSearch={handleSearch}
+                    onAddModule={addModule}
+                    calculateSemesterGPA={calculateSemesterGPA}
+                    calculateSemesterSU={calculateSemesterSU}
+                    selectedModules={selectedModules}
+                    hideGrades={hideGrades}
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="flex justify-start items-start">
               <GPASummary 
                 gpaData={gpaData} 
+                suData={suData}
                 hideGrades={hideGrades} 
                 onToggleHideGrades={toggleHideGrades}
                 academicSettings={academicSettings}
@@ -1515,15 +1553,15 @@ const NUSGPACalculator = () => {
             })()}
           </div>
         </div>
+        
+        <NUSModsAcknowledgement />
 
-        <SUOptionsDisplay suData={suData} hideGrades={hideGrades} />
         <SUHint showHint={showHint} onHide={() => setShowHint(false)} />
         <NotificationPopup 
           message={notificationMessage} 
           isVisible={showNotification} 
           onHide={hideNotification} 
         />
-        <NUSModsAcknowledgement />
       </div>
     </div>
   );
